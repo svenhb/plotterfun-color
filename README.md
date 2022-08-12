@@ -1,8 +1,10 @@
-# Plotterfun
+# Plotterfun-color
 
 A collection of algorithms for turning images into vector art.
 
-Try it out here: [https://mitxela.com/plotterfun/](https://mitxela.com/plotterfun/)
+The original: Try it out here: [https://mitxela.com/plotterfun/](https://mitxela.com/plotterfun/)
+
+My version with color separation: [https://grbl-plotter.de/plotterfun-color/](https://grbl-plotter.de/plotterfun-color/)
 
 The aim is to make it simple to develop new algorithms. Each algorithm is a separate .js file and is loaded as a webworker. Some of the algorithms are my versions of other vector art programs.
 
