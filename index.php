@@ -116,6 +116,10 @@
                     <option value=needles.js>Needles</option>
                     <option value=implode.js>Implode</option>
                     <option value=halftone.js>Halftone</option>
+					<option value=boxes.js>Boxes</option>
+					<option value=dots.js>Dots</option>
+					<option value=jaggy.js>Jaggy</option>
+					<option value=longwave.js>Longwave</option>
                 </select>
                 <img id=buffering src=loading.gif style='vertical-align:middle; display:none'>
             </form>
@@ -123,6 +127,22 @@
 
             <button style='font-size:large; width: 250px; margin:10px' onclick=download()>Download SVG</button>
             <button style='font-size:large; width: 250px; margin:10px' onclick=copytoclipboard()>Copy SVG to clipboard</button><br>
+	  
+				  
+	  
+	  
+																	
+																	
+	   
+					 
+													 
+											   
+	  
+			   
+						
+																		
+											   
+	  
 
             <div style='padding:10px 15px;'>
                  plotterfun by mitxela<br>
@@ -160,6 +180,9 @@
 
     modeRGB = false;
     modeK = true;
+																	
+															  
+	  
 
     function checkScroll(){
         svg.style.position= (window.innerWidth < canvas.width+320 || window.innerHeight < canvas.height+10) ? "absolute" : "fixed";
@@ -185,6 +208,8 @@
         tab2.className=''
     }
     tabImage()
+									   
+						   
 
     function preset(source){
         img = new Image();
@@ -192,6 +217,8 @@
             let w=img.width, h=img.height;
 
             cw=parseInt(pcw.defaultValue) // reset size - worth it?
+		  
+			  
 
             if (w>cw || h>ch) { ch=Math.round(cw*h/w) }
             else if (w>10&&h>10){ch=h;cw=w}
@@ -215,15 +242,26 @@
             img = new Image();
             img.onload=function(){
                 let w=img.width, h=img.height;
+ 
+			
 
                 cw=parseInt(pcw.defaultValue) // reset size - worth it?
+																								  
 
                 if (w>cw || h>ch) { ch=Math.round(cw*h/w) }
                 else if (w>10&&h>10){ch=h;cw=w}
                 preview.height = pch.value = ch 
                 preview.width = pcw.value = cw
+ 
+		  
 
 //				pchm.value = pcwm.value * cw/ch;
+										
+			   
+						 
+					  
+						  
+									
 
                 scale = Math.min(ch/h, cw/w)
                 offset = [ cw/2, ch/2 ]
@@ -240,6 +278,9 @@
 		evt.preventDefault();
 
 		var gewaehlteDateien = evt.dataTransfer.files; // FileList Objekt
+									 
+									  
+									
 
 		let w=img.width, h=img.height;
 
@@ -274,6 +315,15 @@
         prectx.clearRect(0,0,cw,ch)
         prectx.drawImage(img, offset[0]-scale*img.width*0.5,offset[1]-scale*img.height*0.5, scale*img.width, scale*img.height)
     }
+													 
+   
+		   
+ 
+				
+				  
+							 
+																														
+ 
     preview.onmousedown=function(e){
         let dx=e.clientX, dy=e.clientY
         let csc = cw / preview.getBoundingClientRect().width
@@ -341,24 +391,64 @@
         ctx.drawImage(preview, 0,0);
         imgData = ctx.getImageData(0, 0, cw, ch);
         
+ 
+						   
+												  
+													  
+ 
+				   
+						
         [canvas_c.width, canvas_c.height] = [cw, ch];
         [canvas_m.width, canvas_m.height] = [cw, ch];
+						 
         [canvas_y.width, canvas_y.height] = [cw, ch];
         [canvas_k.width, canvas_k.height] = [cw, ch];
+							 
+						
+						  
+			 
+	  
+									
+ 
+									  
+										   
+										 
+						   
+										 
+									   
 
         checkScroll();
         process();
+																	 
+											   
     }
 
     function byteRange (a) {
         if (a > 255) {a = 255; }
         if (a < 0) {	a = 0;  }
         return Math.floor(a);
+															  
+																						
     }
     function applyFilter (channel, context) {   // https://wiki.selfhtml.org/wiki/JavaScript/Canvas/Pixel_Manipulation
         var data, mod, x, y, offset;
         var r,g,b,k,c,m,yl;
         mod = context.createImageData(cw, ch);
+		  
+										
+																			
+																		 
+									 
+				 
+		  
+										   
+														 
+								  
+																						   
+																						   
+							
+												 
+																				
 
         for (x = 0; x < cw; x++) {
             for (y = 0; y < ch; y++) {
@@ -496,6 +586,7 @@
         script.setAttribute('src', src);
         document.head.append(script);
     }
+					 
 
     function loadWorker(src){
         buffering.style.display='inline-block'
@@ -513,11 +604,20 @@
             appendScript(src);
 
         } else window.myWorker = new Worker(src);
+							   
 
         msgbox.innerHTML = "";
+							
+										 
+								   
+					 
+							  
+													 
+			   
 
         myWorker.onmessage = function(msg) {
             let [type, data] = msg.data;
+							  
 
             // setup, declare parameters
             if (type == 'sliders') {
@@ -531,10 +631,22 @@
                 // message, e.g. progress bar
             } else if (type == 'msg') {
                 msgbox.innerHTML = data;
+	  
+   
+ 
 
             } else if (type == 'dbg'){
                 window.data = data;
                 console.log(data);
+													  
+										
+										  
+																	 
+													   
+														  
+																													   
+						   
+ 
 
             // vector data result
             }else if (type == 'svg-path'){
