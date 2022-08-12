@@ -80,8 +80,8 @@
             <form id=imgSelect>
                 Examples: 
                 <select id=examples onchange='preset(this.value)'>
-                    <option value=test.jpg>TV test pattern</option>
-                    <option value=graphic_grbl.svg>grbl sign</option>
+                    <option value=image_testpattern.jpg>TV test pattern</option>
+                    <option value=image_graphic_grbl.svg>grbl sign</option>
                     <option value=image_modell.png>GRBL-Plotter</option>
                     <option value=image_flying_devil.png>Flying devil</option>
                     <option value=image_cent.bmp>Cent</option>
