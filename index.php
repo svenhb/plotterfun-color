@@ -147,7 +147,7 @@
             <div style='padding:10px 15px;'>
                  plotterfun by mitxela<br>
                  <a href=https://mitxela.com/projects/plotting>more info</a> &bull; 
-                 <a href=https://github.com/mitxela/plotterfun>source code</a>
+                 <a href=https://github.com/svenhb/plotterfun-color>source code</a>
             </div>
         </div>
     <svg></svg>
