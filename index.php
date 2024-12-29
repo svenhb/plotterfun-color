@@ -26,7 +26,8 @@
             button:hover{background:#5d90bc !important;color:#fff}
             #tabbar button.active{background:#99afbf}
             #imgselect,#webcam {text-align:justify;text-align-last:justify}
-            #algoSelect{background:#d2e4f0;margin:5px 0;border:solid #5d90bc;border-width:2px 0 2px 0}
+ 			#imgselect button{margin:0}
+           #algoSelect{background:#d2e4f0;margin:5px 0;border:solid #5d90bc;border-width:2px 0 2px 0}
             #imgSelect{background:#d2e4f0;margin:5px 0;border:solid #5d90bc;border-width:2px 0 2px 0}
             a:hover{color:red}
             canvas{ /* checkerboard pattern */ 
@@ -52,7 +53,7 @@
         </style>
         <link rel=stylesheet href=range.css>
     </head>
-    <body id=body onload='preset("test.jpg")'>
+    <body id=body onload='bodyOnLoad()'>
         <div id=sidebar>
             <h2>Plotterfun color</h2>
             <div id=tabbar>
@@ -69,6 +70,7 @@
 -->					</table>
                 </form>
                 <canvas></canvas><br>
+                <button onclick='pasteImage()'>Paste image</button>
                 <button onclick='selectImage()'>Select image</button>
                 <button onclick='useImage()'>Use image</button>
             </div>
@@ -80,8 +82,8 @@
             <form id=imgSelect>
                 Examples: 
                 <select id=examples onchange='preset(this.value)'>
-                    <option value=image_testpattern.jpg>TV test pattern</option>
-                    <option value=image_graphic_grbl.svg>grbl sign</option>
+                    <option value=test.jpg>TV test pattern</option>
+                    <option value=graphic_grbl.svg>grbl sign</option>
                     <option value=image_modell.png>GRBL-Plotter</option>
                     <option value=image_flying_devil.png>Flying devil</option>
                     <option value=image_cent.bmp>Cent</option>
@@ -103,6 +105,7 @@
                 <select id=algorithm onchange='loadWorker(this.value)'>
                     <option value=squiggle.js>Squiggle</option>
                     <option value=squiggleLeftRight.js>Squiggle Left/Right</option>
+                    <option value=lineDistortionLeftRightNoWhite.js>Line distortion</option>
                     <option value=spiral.js>Spiral</option>
                     <option value=polyspiral.js>Polygon Spiral</option>
                     <option value=sawtooth.js>Sawtooth</option>
@@ -116,10 +119,6 @@
                     <option value=needles.js>Needles</option>
                     <option value=implode.js>Implode</option>
                     <option value=halftone.js>Halftone</option>
-					<option value=boxes.js>Boxes</option>
-					<option value=dots.js>Dots</option>
-					<option value=jaggy.js>Jaggy</option>
-					<option value=longwave.js>Longwave</option>
                 </select>
                 <img id=buffering src=loading.gif style='vertical-align:middle; display:none'>
             </form>
@@ -127,30 +126,18 @@
 
             <button style='font-size:large; width: 250px; margin:10px' onclick=download()>Download SVG</button>
             <button style='font-size:large; width: 250px; margin:10px' onclick=copytoclipboard()>Copy SVG to clipboard</button><br>
-	  
-				  
-	  
-	  
-																	
-																	
-	   
-					 
-													 
-											   
-	  
-			   
-						
-																		
-											   
-	  
 
             <div style='padding:10px 15px;'>
                  plotterfun by mitxela<br>
                  <a href=https://mitxela.com/projects/plotting>more info</a> &bull; 
-                 <a href=https://github.com/svenhb/plotterfun-color>source code</a>
+                 <a href=https://github.com/mitxela/plotterfun>source code</a><br>
+				 <a href="..//plotterfun">Plotterfun classic</a><br>
+				 <a href="..//plotterfun-width">Plotterfun pen-width</a><br>
+			<!--	 <a href="..//plotterfun-color">Plotterfun color</a><br>-->
             </div>
         </div>
     <svg></svg>
+	<p id="log"></p>
     <div id=msgbox></div>
 		<!-- a spacer gif -->
 		<img src="https://grbl-plotter.de/plugins/hitcount/ping/ping.php?from=plotterfun-color" />
@@ -180,9 +167,47 @@
 
     modeRGB = false;
     modeK = true;
-																	
-															  
-	  
+
+	function bodyOnLoad(){
+		log("Update 2024-12-29: <ul><li>Paste PNG from clipboard</li><li>Copy to clipboard in Inkscape format</li><li>New algorythm 'Line distortion'</li></ul>");
+		//preset("example_modell.png");
+		preset("test.jpg");
+	}
+
+	async function pasteImage() {
+	  try {
+		const clipboardContents = await navigator.clipboard.read();
+		for (const item of clipboardContents) {
+		  if (!item.types.includes("image/png")) {
+			throw new Error("Clipboard does not contain PNG image data.");
+		  }
+		  const blob = await item.getType("image/png");
+		  img = new Image();
+        img.onload=function(){
+            let w=img.width, h=img.height;
+
+            cw=parseInt(pcw.defaultValue) // reset size - worth it?
+
+            if (w>cw || h>ch) { ch=Math.round(cw*h/w) }
+            else if (w>10&&h>10){ch=h;cw=w}
+            preview.height = pch.value = ch 
+            preview.width = pcw.value = cw
+
+            scale = Math.min(ch/h, cw/w)
+            offset = [ cw/2, ch/2 ]
+            draw()
+            setTimeout(useImage, 500);
+        }
+		  img.src = URL.createObjectURL(blob);
+		}
+	  } catch (error) {
+		log(error.message);
+	  }
+	}	
+	const logElement = document.querySelector("#log");
+	function log(text) {
+	  logElement.innerHMTL = text;
+	}	
 
     function checkScroll(){
         svg.style.position= (window.innerWidth < canvas.width+320 || window.innerHeight < canvas.height+10) ? "absolute" : "fixed";
@@ -208,8 +233,6 @@
         tab2.className=''
     }
     tabImage()
-									   
-						   
 
     function preset(source){
         img = new Image();
@@ -217,8 +240,6 @@
             let w=img.width, h=img.height;
 
             cw=parseInt(pcw.defaultValue) // reset size - worth it?
-		  
-			  
 
             if (w>cw || h>ch) { ch=Math.round(cw*h/w) }
             else if (w>10&&h>10){ch=h;cw=w}
@@ -242,26 +263,15 @@
             img = new Image();
             img.onload=function(){
                 let w=img.width, h=img.height;
- 
-			
 
                 cw=parseInt(pcw.defaultValue) // reset size - worth it?
-																								  
 
                 if (w>cw || h>ch) { ch=Math.round(cw*h/w) }
                 else if (w>10&&h>10){ch=h;cw=w}
                 preview.height = pch.value = ch 
                 preview.width = pcw.value = cw
- 
-		  
 
 //				pchm.value = pcwm.value * cw/ch;
-										
-			   
-						 
-					  
-						  
-									
 
                 scale = Math.min(ch/h, cw/w)
                 offset = [ cw/2, ch/2 ]
@@ -278,9 +288,6 @@
 		evt.preventDefault();
 
 		var gewaehlteDateien = evt.dataTransfer.files; // FileList Objekt
-									 
-									  
-									
 
 		let w=img.width, h=img.height;
 
@@ -315,15 +322,6 @@
         prectx.clearRect(0,0,cw,ch)
         prectx.drawImage(img, offset[0]-scale*img.width*0.5,offset[1]-scale*img.height*0.5, scale*img.width, scale*img.height)
     }
-													 
-   
-		   
- 
-				
-				  
-							 
-																														
- 
     preview.onmousedown=function(e){
         let dx=e.clientX, dy=e.clientY
         let csc = cw / preview.getBoundingClientRect().width
@@ -391,64 +389,24 @@
         ctx.drawImage(preview, 0,0);
         imgData = ctx.getImageData(0, 0, cw, ch);
         
- 
-						   
-												  
-													  
- 
-				   
-						
         [canvas_c.width, canvas_c.height] = [cw, ch];
         [canvas_m.width, canvas_m.height] = [cw, ch];
-						 
         [canvas_y.width, canvas_y.height] = [cw, ch];
         [canvas_k.width, canvas_k.height] = [cw, ch];
-							 
-						
-						  
-			 
-	  
-									
- 
-									  
-										   
-										 
-						   
-										 
-									   
 
         checkScroll();
         process();
-																	 
-											   
     }
 
     function byteRange (a) {
         if (a > 255) {a = 255; }
         if (a < 0) {	a = 0;  }
         return Math.floor(a);
-															  
-																						
     }
     function applyFilter (channel, context) {   // https://wiki.selfhtml.org/wiki/JavaScript/Canvas/Pixel_Manipulation
         var data, mod, x, y, offset;
         var r,g,b,k,c,m,yl;
         mod = context.createImageData(cw, ch);
-		  
-										
-																			
-																		 
-									 
-				 
-		  
-										   
-														 
-								  
-																						   
-																						   
-							
-												 
-																				
 
         for (x = 0; x < cw; x++) {
             for (y = 0; y < ch; y++) {
@@ -586,7 +544,6 @@
         script.setAttribute('src', src);
         document.head.append(script);
     }
-					 
 
     function loadWorker(src){
         buffering.style.display='inline-block'
@@ -604,20 +561,11 @@
             appendScript(src);
 
         } else window.myWorker = new Worker(src);
-							   
 
         msgbox.innerHTML = "";
-							
-										 
-								   
-					 
-							  
-													 
-			   
 
         myWorker.onmessage = function(msg) {
             let [type, data] = msg.data;
-							  
 
             // setup, declare parameters
             if (type == 'sliders') {
@@ -631,22 +579,10 @@
                 // message, e.g. progress bar
             } else if (type == 'msg') {
                 msgbox.innerHTML = data;
-	  
-   
- 
 
             } else if (type == 'dbg'){
                 window.data = data;
                 console.log(data);
-													  
-										
-										  
-																	 
-													   
-														  
-																													   
-						   
- 
 
             // vector data result
             }else if (type == 'svg-path'){
@@ -736,9 +672,27 @@
     function copytoclipboard(){
         const svgString = '<?xml version="1.0" standalone="no"?>'	//<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\r\n'
         + (new XMLSerializer()).serializeToString(svg).replace(/</g,"\r\n<");
+		//copyCanvasContentsToClipboard(svgString);
         navigator.clipboard.writeText(svgString);
     }
 
+	async function copyCanvasContentsToClipboard(text) {
+		const type = "image/svg+xml";	//"image/x-inkscape-svg";
+		if (ClipboardItem.supports(type)) {
+		// Copy canvas to blob
+			try {
+				const blob = new Blob([text], { type });
+				const data = [new ClipboardItem({ [type]: blob })];
+				await navigator.clipboard.write(data);
+				log("Copied");
+			} catch (error) {
+			log(error);
+			}
+		} else {
+		log(type + " is not supported");
+		}
+	}
+	
     algorithm.onchange()
     </script>
 
